@@ -5,3 +5,9 @@ This program generates a markov chain based on an input file.
 A Markov Chain is a random process describing a sequence of possible events
 where the probability of each event is based on the previous event.  They
 can be used to generate sentences based on a sample text.
+
+In simpler words, we are going to generate text that sounds like a human wrote
+it. We will pick each word based off of the pervious two words and only words
+that appeard after them in the input text. We can build smarter sounds chains
+by basing off of 3 or more words, but we would need increasingly larger texts
+to ensure that we will have sufficient options to pick from.
