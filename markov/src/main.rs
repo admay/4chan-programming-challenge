@@ -1,4 +1,6 @@
-use std::{error::Error, path::PathBuf, str::FromStr};
+use std::{
+    collections::HashMap, error::Error, fs::OpenOptions, io::Read, path::PathBuf, str::FromStr,
+};
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)] // StructOpt for cli args, debug for toString()
@@ -12,8 +14,16 @@ struct Opt {
     length: Option<u32>,
 }
 
+fn read_file(filename: PathBuf) -> Result<String, Box<dyn Error>> {
+    let mut file = OpenOptions::new().read(true).open(filename)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+    Ok(contents)
+}
+
 fn run(input: PathBuf, length: u32) -> Result<(), Box<dyn Error>> {
-    println!("Input: {:?}\nLength: {}", input, length);
+    let file_str = read_file(input)?;
+    println!("File String:\n{}", file_str);
     Ok(())
 }
 
