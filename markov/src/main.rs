@@ -3,6 +3,8 @@ use std::{
 };
 use structopt::StructOpt;
 
+extern use itertools;
+
 #[derive(StructOpt, Debug)] // StructOpt for cli args, debug for toString()
 #[structopt(name = "markov")]
 struct Opt {
@@ -12,6 +14,21 @@ struct Opt {
     /// Output Length
     #[structopt(short = "l", long = "length")]
     length: Option<u32>,
+}
+
+fn build_table(words: Vec<&str>) -> HashMap<(&str, &str), Vec<&str>> {
+    let mut ret = HashMap::new();
+    for (w0, w1, w2) in izip!(&words, &words[1..], &words[2..]) {
+        // add w2 to the key (w0, w1)
+        let current = ret.entry((*w0, *w1)).or_insert_with(Vec::new);
+        current.push(*w2);
+    }
+    ret
+}
+
+fn split_words(w: &str) -> Vec<&str> {
+    let spaces_re = Regex::new(r" +").unwrap();
+    spaces_re.split(w).collect::<Vec<&str>>()
 }
 
 fn read_file(filename: PathBuf) -> Result<String, Box<dyn Error>> {
