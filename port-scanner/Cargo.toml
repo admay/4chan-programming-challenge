@@ -5,6 +5,3 @@ name = "port-scanner"
 version = "0.1.0"
 [dependencies]
 structopt = "*"
-nitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
