@@ -3,6 +3,7 @@ use std::{
 };
 use regex::Regex;
 use structopt::StructOpt;
+use rand::{seq::SliceRandom, thread_rng, Rng};
 
 #[macro_use]
 extern crate itertools;
@@ -44,10 +45,28 @@ fn run(input: PathBuf, length: u32) -> Result<(), Box<dyn Error>> {
     // read file and build lookup table
     let file_str = read_file(input)?;
     let words = split_words(&file_str);
-    let words_table = build_table(words);
 
-    println!("File String:\n{}\n\n", file_str);
-    println!("Words Table:\n{:#?}\n\n", words_table);
+    // grab our random starting word seqence
+    let mut rng = thread_rng();
+    let i = rng.gen_range(0, words.len() -3);
+
+    let mut w0 = words[i];
+    let mut w1 = words[i + 1];
+    let mut w2 = words[i + 2];
+
+    // create the words table
+    let lookup = build_table(words);
+
+    for _ in 0..length {
+        // append to output
+        print!("{} ", w2);
+
+
+        w2 = &lookup[&(w0, w1)].choose(&mut rng).unwrap();
+        w0 = w1;
+        w1 = w2;
+    }
+
     Ok(())
 }
 
@@ -64,8 +83,8 @@ fn main() {
     let opt = Opt::from_args();
     let filename = opt
         .input
-        .unwrap_or_else(|| PathBuf::from_str("example.txt").unwrap());
-    let length = opt.length.unwrap_or(350);
+        .unwrap_or_else(|| PathBuf::from_str("poetry.txt").unwrap());
+    let length = opt.length.unwrap_or(150);
 
     if let Err(e) = run(filename, length) { // if error, exit 1
         eprintln!("ERROR: {}", e);
