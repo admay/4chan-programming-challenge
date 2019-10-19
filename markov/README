@@ -1,0 +1,7 @@
+Markov Chain Generator
+
+This program generates a markov chain based on an input file.
+
+A Markov Chain is a random process describing a sequence of possible events
+where the probability of each event is based on the previous event.  They
+can be used to generate sentences based on a sample text.
