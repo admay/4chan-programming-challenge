@@ -1,9 +1,11 @@
 use std::{
     collections::HashMap, error::Error, fs::OpenOptions, io::Read, path::PathBuf, str::FromStr,
 };
+use regex::Regex;
 use structopt::StructOpt;
 
-extern use itertools;
+#[macro_use]
+extern crate itertools;
 
 #[derive(StructOpt, Debug)] // StructOpt for cli args, debug for toString()
 #[structopt(name = "markov")]
@@ -39,8 +41,13 @@ fn read_file(filename: PathBuf) -> Result<String, Box<dyn Error>> {
 }
 
 fn run(input: PathBuf, length: u32) -> Result<(), Box<dyn Error>> {
+    // read file and build lookup table
     let file_str = read_file(input)?;
-    println!("File String:\n{}", file_str);
+    let words = split_words(&file_str);
+    let words_table = build_table(words);
+
+    println!("File String:\n{}\n\n", file_str);
+    println!("Words Table:\n{:#?}\n\n", words_table);
     Ok(())
 }
 
