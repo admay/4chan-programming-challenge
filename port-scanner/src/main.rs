@@ -30,7 +30,7 @@ fn scan(tx: Sender<u16>, start_port: u16, end_port: u16, host: IpAddr, num_threa
     let mut current_port = start_port + 1;
 
     loop {
-        println!("Scanning port {}", current_port);
+        print!(".");
         match TcpStream::connect((host, current_port)) {
             Ok(_) => {
                 io::stdout().flush().unwrap();
@@ -51,7 +51,7 @@ fn main() {
     let opt = Opt::from_args();
 
     let host = opt.host.unwrap_or_else(|| IpAddr::from_str("127.0.0.1").unwrap());
-    let num_threads = opt.num_threads.unwrap_or(4);
+    let num_threads = opt.num_threads.unwrap_or(1);
 
     let start = opt.start;
     let end = opt.end;
