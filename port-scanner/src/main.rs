@@ -1,8 +1,10 @@
 use structopt::StructOpt;
-use std::net::{IpAddr};
-use std::str::FromStr;
 
-const MAX: u16 = 65535;
+use std::net::{IpAddr, TcpStream};
+use std::str::FromStr;
+use std::io::{self, Write};
+use std::sync::mpsc::{Sender, channel};
+use std::thread;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "port_scanner")]
@@ -13,18 +15,36 @@ struct Opt {
 
     /// Number of threads
     #[structopt(short = "t", long = "threads")]
-    num_threads: Option<u8>,
+    num_threads: Option<u16>,
 
     /// Starting port
     #[structopt(short = "s", long = "start")]
-    start: u8,
+    start: u16,
 
     /// Ending port
     #[structopt(short = "e", long = "end")]
-    end: u8,
+    end: u16,
 }
 
-fn scan() {
+fn scan(tx: Sender<u16>, start_port: u16, end_port: u16, host: IpAddr, num_threads: u16) {
+    let mut current_port = start_port + 1;
+
+    loop {
+        println!("Scanning port {}", current_port);
+        match TcpStream::connect((host, current_port)) {
+            Ok(_) => {
+                io::stdout().flush().unwrap();
+                tx.send(current_port).unwrap();
+            }
+            Err(_) => {}
+        }
+
+        if (end_port - current_port) <= num_threads {
+            break;
+        }
+
+        current_port += num_threads;
+    }
 }
 
 fn main() {
@@ -35,4 +55,25 @@ fn main() {
 
     let start = opt.start;
     let end = opt.end;
+
+    let (tx, rx) = channel();
+    for i in 0..num_threads {
+        let tx = tx.clone();
+
+        thread::spawn(move || {
+            scan(tx, i, end, host, num_threads);
+        });
+    }
+
+    let mut ports = vec![];
+    drop(tx);
+    for port in rx {
+        ports.push(port);
+    }
+
+    println!("");
+    ports.sort();
+    for port in ports {
+        println!("Port {} is open!", port);
+    }
 }
