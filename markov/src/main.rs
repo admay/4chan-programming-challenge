@@ -1,9 +1,9 @@
+use rand::{seq::SliceRandom, thread_rng, Rng};
+use regex::Regex;
 use std::{
     collections::HashMap, error::Error, fs::OpenOptions, io::Read, path::PathBuf, str::FromStr,
 };
-use regex::Regex;
 use structopt::StructOpt;
-use rand::{seq::SliceRandom, thread_rng, Rng};
 
 #[macro_use]
 extern crate itertools;
@@ -48,7 +48,7 @@ fn run(input: PathBuf, length: u32) -> Result<(), Box<dyn Error>> {
 
     // grab our random starting word seqence
     let mut rng = thread_rng();
-    let i = rng.gen_range(0, words.len() -3);
+    let i = rng.gen_range(0, words.len() - 3);
 
     let mut w0 = words[i];
     let mut w1 = words[i + 1];
@@ -60,7 +60,6 @@ fn run(input: PathBuf, length: u32) -> Result<(), Box<dyn Error>> {
     for _ in 0..length {
         // append to output
         print!("{} ", w2);
-
 
         w2 = &lookup[&(w0, w1)].choose(&mut rng).unwrap();
         w0 = w1;
@@ -86,7 +85,8 @@ fn main() {
         .unwrap_or_else(|| PathBuf::from_str("poetry.txt").unwrap());
     let length = opt.length.unwrap_or(150);
 
-    if let Err(e) = run(filename, length) { // if error, exit 1
+    if let Err(e) = run(filename, length) {
+        // if error, exit 1
         eprintln!("ERROR: {}", e);
         ::std::process::exit(1);
     }
