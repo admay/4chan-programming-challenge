@@ -163,8 +163,6 @@ fn main() {
 
     let pass = gen_password(len, min_num, min_spec, up, low);
 
-    // save to ~/.local/rpass/pass
-
     println!("Password generated: {}", pass);
     println!("If you forget it, it will be saved in ~/.pass for the next 5 password generations.");
 
